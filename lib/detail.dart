@@ -85,7 +85,7 @@ class _DetailState extends State<Detail> {
       body: (isLoad)
           ? Center(child: CupertinoActivityIndicator())
           : Padding(
-              padding: EdgeInsets.only(top: 60, left: 20, right: 20),
+              padding: EdgeInsets.only(top: 40, left: 20, right: 20),
               child: Column(
                 children: [
                   Row(
