@@ -5,6 +5,6 @@ shared_preferences=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted
 shared_preferences_android=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_android-2.0.14/
 shared_preferences_ios=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_ios-2.1.1/
 shared_preferences_linux=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_linux-2.1.2/
-shared_preferences_macos=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_macos-2.0.4/
+shared_preferences_macos=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_macos-2.0.5/
 shared_preferences_web=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_web-2.0.4/
 shared_preferences_windows=/home/paratonsp/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_windows-2.1.2/
