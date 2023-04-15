@@ -1,4 +1,4 @@
-package com.example.ikc_mobile_flutter
+package com.pesoros.cekktp
 
 import io.flutter.embedding.android.FlutterActivity
 

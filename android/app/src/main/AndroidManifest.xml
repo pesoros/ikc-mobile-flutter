@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ikc_mobile_flutter">
+    package="com.pesoros.cekktp">
    <application
-        android:label="ikc_mobile_flutter"
+        android:label="Cek KTP!"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,5 +30,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8287187411389593~8031959062"/>
     </application>
 </manifest>

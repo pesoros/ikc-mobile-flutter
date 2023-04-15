@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ikc_mobile_flutter/global.dart';
 import 'package:latlng/latlng.dart';
 import 'package:nik_validator/nik_validator.dart';
@@ -33,12 +34,17 @@ class _DetailState extends State<Detail> {
   String? city;
   String? subdistrict;
   String? postalCode;
+  String? avatar;
   var controller;
 
+  RewardedAd? _rewardedAd;
+  BannerAd? bannerAd;
+  int maxFailedLoadAttempts = 3;
+
   getData(wid) async {
-    if (!mounted) return;
     NIKModel result = await NIKValidator.instance.parse(nik: wid);
     if (result.valid!) {
+      if (!mounted) return;
       setState(() {
         nik = result.nik;
         uniqueCode = result.uniqueCode;
@@ -52,25 +58,88 @@ class _DetailState extends State<Detail> {
         subdistrict = result.subdistrict;
         postalCode = result.postalCode;
       });
+      if (age! <= 25 && gender! == "LAKI-LAKI") {
+        avatar = "assets/gender/M25.png";
+      }
+      if (age! > 25 && age! < 50 && gender! == "LAKI-LAKI") {
+        avatar = "assets/gender/M50.png";
+      }
+      if (age! >= 50 && gender! == "LAKI-LAKI") {
+        avatar = "assets/gender/M75.png";
+      }
+
+      if (age! <= 25 && gender! == "PEREMPUAN") {
+        avatar = "assets/gender/F25.png";
+      }
+      if (age! > 25 && age! < 50 && gender! == "PEREMPUAN") {
+        avatar = "assets/gender/F50.png";
+      }
+      if (age! >= 50 && gender! == "PEREMPUAN") {
+        avatar = "assets/gender/F75.png";
+      }
       String web = "https://geocode.xyz";
       Uri url = Uri.parse(web);
       var request = await http.post(url, body: {
         "scantext": city,
         "json": "1",
-        "auth": "837135782256818673161x88653",
+        "auth": CustomData.geoCode,
       });
       var res = jsonDecode(request.body);
+      if (!mounted) return;
       setState(() {
         controller = MapController(
           location:
               LatLng(double.parse(res['latt']), double.parse(res['longt'])),
           zoom: 10,
         );
-        isLoad = false;
       });
+      // loadAd();
+      endAd();
     } else {
-      Navigator.pop(context);
+      Navigator.pop(context, "xxx");
     }
+  }
+
+  void endAd() {
+    setState(() {
+      isLoad = false;
+    });
+  }
+
+  void loadAd() {
+    RewardedAd.load(
+      adUnitId: CustomData.adUnitId,
+      request: AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _showRewardedAd();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          endAd();
+        },
+      ),
+    );
+  }
+
+  void _showRewardedAd() {
+    if (_rewardedAd == null) {
+      return;
+    }
+    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (RewardedAd ad) {
+        endAd();
+        ad.dispose();
+      },
+      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
+        endAd();
+        ad.dispose();
+      },
+    );
+    _rewardedAd!.setImmersiveMode(true);
+    _rewardedAd!
+        .show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {});
+    _rewardedAd = null;
   }
 
   @override
@@ -100,7 +169,14 @@ class _DetailState extends State<Detail> {
                             width: MediaQuery.of(context).size.width / 3.5,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
-                              color: Colors.red,
+                              color: (gender == "LAKI-LAKI")
+                                  ? CustomColor.blueColor
+                                  : CustomColor.redColor,
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    avatar ?? "assets/gender/M25.png"),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                           Positioned(
@@ -110,7 +186,7 @@ class _DetailState extends State<Detail> {
                               padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(60),
-                                  color: CustomColor.blueColor),
+                                  color: CustomColor.greenColor),
                               child: Icon(
                                 Icons.done,
                                 color: CustomColor.whiteColor,
@@ -155,7 +231,7 @@ class _DetailState extends State<Detail> {
                     children: [
                       Expanded(
                         child: Text(
-                          "$bornDate | $age Years",
+                          "$bornDate",
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -197,7 +273,9 @@ class _DetailState extends State<Detail> {
                         child: Container(
                           padding: EdgeInsets.all(15),
                           decoration: BoxDecoration(
-                              color: CustomColor.blueColor,
+                              color: (gender == "LAKI-LAKI")
+                                  ? CustomColor.blueColor
+                                  : CustomColor.redColor,
                               borderRadius: BorderRadius.circular(10)),
                           child: Center(
                             child: Text(
@@ -222,7 +300,7 @@ class _DetailState extends State<Detail> {
                               borderRadius: BorderRadius.circular(10)),
                           child: Center(
                             child: Text(
-                              age.toString() + " Years",
+                              age.toString() + " Tahun",
                               style: TextStyle(
                                 fontSize: 14,
                                 color: CustomColor.blackColor,
