@@ -93,8 +93,8 @@ class _DetailState extends State<Detail> {
           zoom: 10,
         );
       });
-      // loadAd();
-      endAd();
+      loadAd();
+      // endAd();
     } else {
       Navigator.pop(context, "xxx");
     }
