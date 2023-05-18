@@ -93,8 +93,7 @@ class _DetailState extends State<Detail> {
           zoom: 10,
         );
       });
-      _showInterstitialAd();
-      // endAd();
+      _createInterstitialAd();
     } else {
       Navigator.pop(context, "xxx");
     }
@@ -108,10 +107,14 @@ class _DetailState extends State<Detail> {
 
   void _showInterstitialAd() {
     if (_interstitialAd == null) {
+      endAd();
       return;
     }
+
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) {},
+      onAdShowedFullScreenContent: (InterstitialAd ad) {
+        endAd();
+      },
       onAdDismissedFullScreenContent: (InterstitialAd ad) {
         ad.dispose();
         endAd();
@@ -129,30 +132,37 @@ class _DetailState extends State<Detail> {
 
   void _createInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: 'ca-app-pub-8287187411389593/1759762398',
-        request: AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (InterstitialAd ad) {
-            endAd();
-            _interstitialAd = ad;
-            _numInterstitialLoadAttempts = 0;
-            _interstitialAd!.setImmersiveMode(true);
-          },
-          onAdFailedToLoad: (LoadAdError error) {
-            endAd();
-            _numInterstitialLoadAttempts += 1;
-            _interstitialAd = null;
-            if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
-              _createInterstitialAd();
-            }
-          },
-        ));
+      adUnitId: 'ca-app-pub-8287187411389593/1759762398',
+      request: AdRequest(httpTimeoutMillis: 5000),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          _interstitialAd = ad;
+          _numInterstitialLoadAttempts = 0;
+          _interstitialAd!.setImmersiveMode(true);
+          _showInterstitialAd();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          endAd();
+          _numInterstitialLoadAttempts += 1;
+          _interstitialAd = null;
+          if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
+            _createInterstitialAd();
+          }
+        },
+      ),
+    );
   }
 
   @override
   void initState() {
     getData(widget.id);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd?.dispose();
   }
 
   @override
