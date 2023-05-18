@@ -37,8 +37,8 @@ class _DetailState extends State<Detail> {
   String? avatar;
   var controller;
 
-  RewardedAd? _rewardedAd;
-  BannerAd? bannerAd;
+  InterstitialAd? _interstitialAd;
+  int _numInterstitialLoadAttempts = 0;
   int maxFailedLoadAttempts = 3;
 
   getData(wid) async {
@@ -93,7 +93,7 @@ class _DetailState extends State<Detail> {
           zoom: 10,
         );
       });
-      loadAd();
+      _showInterstitialAd();
       // endAd();
     } else {
       Navigator.pop(context, "xxx");
@@ -106,40 +106,47 @@ class _DetailState extends State<Detail> {
     });
   }
 
-  void loadAd() {
-    RewardedAd.load(
-      adUnitId: CustomData.adUnitId,
-      request: AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          _rewardedAd = ad;
-          _showRewardedAd();
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          endAd();
-        },
-      ),
-    );
-  }
-
-  void _showRewardedAd() {
-    if (_rewardedAd == null) {
+  void _showInterstitialAd() {
+    if (_interstitialAd == null) {
       return;
     }
-    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdDismissedFullScreenContent: (RewardedAd ad) {
-        endAd();
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) {},
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
         ad.dispose();
+        endAd();
+        _createInterstitialAd();
       },
-      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-        endAd();
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
         ad.dispose();
+        endAd();
+        _createInterstitialAd();
       },
     );
-    _rewardedAd!.setImmersiveMode(true);
-    _rewardedAd!
-        .show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {});
-    _rewardedAd = null;
+    _interstitialAd!.show();
+    _interstitialAd = null;
+  }
+
+  void _createInterstitialAd() {
+    InterstitialAd.load(
+        adUnitId: 'ca-app-pub-8287187411389593/1759762398',
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            endAd();
+            _interstitialAd = ad;
+            _numInterstitialLoadAttempts = 0;
+            _interstitialAd!.setImmersiveMode(true);
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            endAd();
+            _numInterstitialLoadAttempts += 1;
+            _interstitialAd = null;
+            if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
+              _createInterstitialAd();
+            }
+          },
+        ));
   }
 
   @override
