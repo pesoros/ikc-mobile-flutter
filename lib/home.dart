@@ -19,91 +19,84 @@ class _HomeState extends State<Home> {
     return KeyboardDismisser(
       child: Scaffold(
         backgroundColor: CustomColor.whiteColor,
-        body: SingleChildScrollView(
-          reverse: true,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40),
-                        child: Text(
-                          "Cek KTP!",
-                          style: TextStyle(
-                            fontSize: CustomSize.defaultTextSize * 2,
-                          ),
-                        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: Text(
+                      "Cek KTP!",
+                      style: TextStyle(
+                        fontSize: CustomSize.defaultTextSize * 2,
                       ),
-                    ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  controller: identityController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                      fontSize: CustomSize.defaultTextSize,
+                      color: CustomColor.blackColor),
+                  decoration: InputDecoration(
+                    hintText: "Nomor KTP",
+                    contentPadding: EdgeInsets.symmetric(horizontal: 40),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: CustomColor.blackColor),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: CustomColor.blackColor),
+                    ),
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextField(
-                      controller: identityController,
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                          fontSize: CustomSize.defaultTextSize,
-                          color: CustomColor.blackColor),
-                      decoration: InputDecoration(
-                        hintText: "Nomor KTP",
-                        contentPadding: EdgeInsets.symmetric(horizontal: 40),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: CustomColor.blackColor),
+                InkWell(
+                  child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      height: 60,
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "CEK",
+                            style: TextStyle(
+                                fontSize: CustomSize.defaultTextSize,
+                                color: CustomColor.blackColor),
+                          ),
+                        ],
+                      )),
+                  hoverColor: CustomColor.blackColor,
+                  onTap: () async {
+                    if (identityController.text.isEmpty) {
+                      showSimpleNotification(
+                        Text(
+                          "Isi nomor KTP terlebih dahulu!",
+                          style: CustomFont.notificationTextStyle,
                         ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: CustomColor.blackColor),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          height: 60,
-                          width: MediaQuery.of(context).size.width,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "CEK",
-                                style: TextStyle(
-                                    fontSize: CustomSize.defaultTextSize,
-                                    color: CustomColor.blackColor),
-                              ),
-                            ],
-                          )),
-                      hoverColor: CustomColor.blackColor,
-                      onTap: () async {
-                        if (identityController.text.isEmpty) {
-                          showSimpleNotification(
-                            Text(
-                              "Isi nomor KTP terlebih dahulu!",
-                              style: CustomFont.notificationTextStyle,
-                            ),
-                            background: CustomColor.blackColor,
-                            elevation: 0,
-                          );
-                        } else {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          goToDetail();
-                        }
-                      },
-                    ),
-                  ],
+                        background: CustomColor.blackColor,
+                        elevation: 0,
+                      );
+                    } else {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      goToDetail();
+                    }
+                  },
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );

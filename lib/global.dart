@@ -15,11 +15,11 @@ class CustomFont {
     color: CustomColor.whiteColor,
   );
   static TextStyle contentTextStyle = TextStyle(
-    fontSize: 24,
+    fontSize: 16,
     color: CustomColor.blackColor,
   );
   static TextStyle boldTextStyle = TextStyle(
-    fontSize: 24,
+    fontSize: 16,
     color: CustomColor.blackColor,
     fontWeight: FontWeight.bold,
   );
