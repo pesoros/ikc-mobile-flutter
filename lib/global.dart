@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 
 class CustomColor {
-  static Color whiteColor = Color(0xffEDF2F6);
-  static Color blackColor = Color(0xff494953);
-  static Color redColor = Color(0xffFF5656);
-  static Color blueColor = Color(0xff6A7EFC);
-  static Color greenColor = Color.fromARGB(255, 31, 214, 31);
+  static Color whiteColor = Color(0xffFCFCFC);
+  static Color blackColor = Color(0xff101010);
 }
 
-class CustomData {
-  static String adUnitId = "ca-app-pub-8287187411389593/9871616356";
-  static String geoCode = '74096582084952121916x15584';
+class CustomSize {
+  static double defaultTextSize = 24;
+}
+
+class CustomFont {
+  static TextStyle notificationTextStyle = TextStyle(
+    fontSize: 24,
+    color: CustomColor.whiteColor,
+  );
+  static TextStyle contentTextStyle = TextStyle(
+    fontSize: 24,
+    color: CustomColor.blackColor,
+  );
+  static TextStyle boldTextStyle = TextStyle(
+    fontSize: 24,
+    color: CustomColor.blackColor,
+    fontWeight: FontWeight.bold,
+  );
 }

@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none' 
 
-version: 1.0.4+4
+version: 1.0.5+5
 
 environment:
   sdk: ">=2.16.2 <3.0.0"
@@ -16,15 +16,9 @@ dependencies:
   intl: ^0.18.0
   flutter_launcher_icons: 0.11.0
   nik_validator: 1.1.2
-  shared_preferences: 2.0.15
   overlay_support: 2.1.0
   keyboard_dismisser: 2.0.1
-  glass: 1.0.1+1
   indonesia: 1.0.1
-  map: 1.3.5+1
-  latlng: 0.2.0
-  http: 0.13.5
-  google_mobile_ads: 2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -36,7 +30,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    - assets/gender/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

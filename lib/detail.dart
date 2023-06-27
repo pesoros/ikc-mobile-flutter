@@ -1,21 +1,13 @@
-// ignore_for_file: must_be_immutable, prefer_typing_uninitialized_variables
-
-import 'dart:convert';
-import 'dart:math';
+// ignore_for_file: must_be_immutable
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ikc_mobile_flutter/global.dart';
-import 'package:latlng/latlng.dart';
 import 'package:nik_validator/nik_validator.dart';
-import 'package:map/map.dart';
-import 'package:http/http.dart' as http;
 
 class Detail extends StatefulWidget {
-  Detail({Key? key, required this.id, required this.name}) : super(key: key);
+  Detail({Key? key, required this.id}) : super(key: key);
   String id;
-  String name;
 
   @override
   State<Detail> createState() => _DetailState();
@@ -34,12 +26,6 @@ class _DetailState extends State<Detail> {
   String? city;
   String? subdistrict;
   String? postalCode;
-  String? avatar;
-  var controller;
-
-  InterstitialAd? _interstitialAd;
-  int _numInterstitialLoadAttempts = 0;
-  int maxFailedLoadAttempts = 3;
 
   getData(wid) async {
     NIKModel result = await NIKValidator.instance.parse(nik: wid);
@@ -58,99 +44,13 @@ class _DetailState extends State<Detail> {
         subdistrict = result.subdistrict;
         postalCode = result.postalCode;
       });
-      if (age! <= 25 && gender! == "LAKI-LAKI") {
-        avatar = "assets/gender/M25.png";
-      }
-      if (age! > 25 && age! < 50 && gender! == "LAKI-LAKI") {
-        avatar = "assets/gender/M50.png";
-      }
-      if (age! >= 50 && gender! == "LAKI-LAKI") {
-        avatar = "assets/gender/M75.png";
-      }
-
-      if (age! <= 25 && gender! == "PEREMPUAN") {
-        avatar = "assets/gender/F25.png";
-      }
-      if (age! > 25 && age! < 50 && gender! == "PEREMPUAN") {
-        avatar = "assets/gender/F50.png";
-      }
-      if (age! >= 50 && gender! == "PEREMPUAN") {
-        avatar = "assets/gender/F75.png";
-      }
-      String web = "https://geocode.xyz";
-      Uri url = Uri.parse(web);
-      var request = await http.post(url, body: {
-        "scantext": city,
-        "json": "1",
-        "auth": CustomData.geoCode,
-      });
-      var res = jsonDecode(request.body);
       if (!mounted) return;
       setState(() {
-        controller = MapController(
-          location:
-              LatLng(double.parse(res['latt']), double.parse(res['longt'])),
-          zoom: 10,
-        );
+        isLoad = false;
       });
-      _createInterstitialAd();
     } else {
       Navigator.pop(context, "xxx");
     }
-  }
-
-  void endAd() {
-    setState(() {
-      isLoad = false;
-    });
-  }
-
-  void _showInterstitialAd() {
-    if (_interstitialAd == null) {
-      endAd();
-      return;
-    }
-
-    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) {
-        endAd();
-      },
-      onAdDismissedFullScreenContent: (InterstitialAd ad) {
-        ad.dispose();
-        endAd();
-        _createInterstitialAd();
-      },
-      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-        ad.dispose();
-        endAd();
-        _createInterstitialAd();
-      },
-    );
-    _interstitialAd!.show();
-    _interstitialAd = null;
-  }
-
-  void _createInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-8287187411389593/1759762398',
-      request: AdRequest(httpTimeoutMillis: 5000),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          _interstitialAd = ad;
-          _numInterstitialLoadAttempts = 0;
-          _interstitialAd!.setImmersiveMode(true);
-          _showInterstitialAd();
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          endAd();
-          _numInterstitialLoadAttempts += 1;
-          _interstitialAd = null;
-          if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
-            _createInterstitialAd();
-          }
-        },
-      ),
-    );
   }
 
   @override
@@ -160,216 +60,78 @@ class _DetailState extends State<Detail> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _interstitialAd?.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: (isLoad)
           ? Center(child: CupertinoActivityIndicator())
-          : Padding(
-              padding: EdgeInsets.only(top: 40, left: 20, right: 20),
+          : SafeArea(
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 10, right: 10),
-                            height: MediaQuery.of(context).size.width / 3.5,
-                            width: MediaQuery.of(context).size.width / 3.5,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: (gender == "LAKI-LAKI")
-                                  ? CustomColor.blueColor
-                                  : CustomColor.redColor,
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    avatar ?? "assets/gender/M25.png"),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(60),
-                                  color: CustomColor.greenColor),
-                              child: Icon(
-                                Icons.done,
-                                color: CustomColor.whiteColor,
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.grey[100],
-                          ),
-                          child: Icon(
-                            Icons.clear,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        widget.name,
-                        style: TextStyle(
-                          fontSize: 38,
-                          color: CustomColor.blackColor,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ))
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "$bornDate",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          province!.toTitleCase() +
-                              ", " +
-                              city!.toTitleCase() +
-                              ", " +
-                              subdistrict!.toTitleCase() +
-                              ", " +
-                              postalCode!.toTitleCase(),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          // maxLines: 1,
-                          // overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                              color: (gender == "LAKI-LAKI")
-                                  ? CustomColor.blueColor
-                                  : CustomColor.redColor,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Center(
-                            child: Text(
-                              zodiac.toString(),
+                  InkWell(
+                    child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        height: 60,
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "KEMBALI",
                               style: TextStyle(
-                                fontSize: 14,
-                                color: CustomColor.whiteColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                                  fontSize: CustomSize.defaultTextSize,
+                                  color: CustomColor.blackColor),
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Center(
-                            child: Text(
-                              age.toString() + " Tahun",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: CustomColor.blackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                          ],
+                        )),
+                    hoverColor: CustomColor.blackColor,
+                    onTap: () => Navigator.pop(context),
                   ),
-                  SizedBox(height: 20),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: MapLayout(
-                        controller: controller,
-                        builder: (context, transformer) {
-                          return TileLayer(
-                            builder: (context, x, y, z) {
-                              final tilesInZoom = pow(2.0, z).floor();
-
-                              while (x < 0) {
-                                x += tilesInZoom;
-                              }
-                              while (y < 0) {
-                                y += tilesInZoom;
-                              }
-
-                              x %= tilesInZoom;
-                              y %= tilesInZoom;
-
-                              //Google Maps
-                              final url =
-                                  'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
-
-                              return Image.network(
-                                url,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          );
-                        },
-                      ),
+                  Divider(
+                    color: Colors.black,
+                    height: 1,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        row('NO. KTP ', '$nik'),
+                        row('KELAMIN ', '$gender'),
+                        row('TGL. LAHIR ', '$bornDate'),
+                        row('UMUR ', '$age'),
+                        row('ZODIAK ', '$zodiac'),
+                        row('PROVINSI ', '$province'),
+                        row('KOTA ', '$city'),
+                        row('KECAMATAN ', '$subdistrict'),
+                        row('KODE POS ', '$postalCode'),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 20),
+                  )
                 ],
               ),
             ),
+    );
+  }
+
+  row(String title, content) {
+    return Column(
+      children: [
+        SizedBox(height: 20),
+        Row(
+          children: [
+            Text(
+              title,
+              style: CustomFont.contentTextStyle,
+            ),
+            Text(
+              content,
+              style: CustomFont.boldTextStyle,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
